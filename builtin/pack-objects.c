@@ -1104,7 +1104,6 @@ static void write_pack_file(void)
 				stop_progress(&progress_state);
 
 				bitmap_writer_show_progress(progress);
-				bitmap_writer_reuse_bitmaps(&to_pack);
 				bitmap_writer_select_commits(indexed_commits, indexed_commits_nr, -1);
 				bitmap_writer_build(&to_pack);
 				bitmap_writer_finish(written_list, nr_written,
@@ -3357,7 +3356,7 @@ static void get_object_list(int ac, const char **av)
 			if (starts_with(line, "--shallow ")) {
 				struct object_id oid;
 				if (get_oid_hex(line + 10, &oid))
-					die("not an SHA-1 '%s'", line + 10);
+					die("not an object name '%s'", line + 10);
 				register_shallow(the_repository, &oid);
 				use_bitmap_index = 0;
 				continue;

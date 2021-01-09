@@ -1,7 +1,7 @@
 #include "cache.h"
 #include "diff.h"
 #include "commit.h"
-#include "sha1-lookup.h"
+#include "hash-lookup.h"
 #include "patch-ids.h"
 
 static int patch_id_defined(struct commit *commit)
@@ -71,7 +71,7 @@ int init_patch_ids(struct repository *r, struct patch_ids *ids)
 
 int free_patch_ids(struct patch_ids *ids)
 {
-	hashmap_free_entries(&ids->patches, struct patch_id, ent);
+	hashmap_clear_and_free(&ids->patches, struct patch_id, ent);
 	return 0;
 }
 
