@@ -45,7 +45,7 @@ static int subtree_name_cmp(const char *one, int onelen,
 	return memcmp(one, two, onelen);
 }
 
-static int subtree_pos(struct cache_tree *it, const char *path, int pathlen)
+int cache_tree_subtree_pos(struct cache_tree *it, const char *path, int pathlen)
 {
 	struct cache_tree_sub **down = it->down;
 	int lo, hi;
@@ -72,7 +72,7 @@ static struct cache_tree_sub *find_subtree(struct cache_tree *it,
 					   int create)
 {
 	struct cache_tree_sub *down;
-	int pos = subtree_pos(it, path, pathlen);
+	int pos = cache_tree_subtree_pos(it, path, pathlen);
 	if (0 <= pos)
 		return it->down[pos];
 	if (!create)
@@ -123,7 +123,7 @@ static int do_invalidate_path(struct cache_tree *it, const char *path)
 	it->entry_count = -1;
 	if (!*slash) {
 		int pos;
-		pos = subtree_pos(it, path, namelen);
+		pos = cache_tree_subtree_pos(it, path, namelen);
 		if (0 <= pos) {
 			cache_tree_free(&it->down[pos]->cache_tree);
 			free(it->down[pos]);
@@ -436,16 +436,20 @@ static int update_one(struct cache_tree *it,
 
 int cache_tree_update(struct index_state *istate, int flags)
 {
-	struct cache_tree *it = istate->cache_tree;
-	struct cache_entry **cache = istate->cache;
-	int entries = istate->cache_nr;
-	int skip, i = verify_cache(cache, entries, flags);
+	int skip, i;
+
+	i = verify_cache(istate->cache, istate->cache_nr, flags);
 
 	if (i)
 		return i;
+
+	if (!istate->cache_tree)
+		istate->cache_tree = cache_tree();
+
 	trace_performance_enter();
 	trace2_region_enter("cache_tree", "update", the_repository);
-	i = update_one(it, cache, entries, "", 0, &skip, flags);
+	i = update_one(istate->cache_tree, istate->cache, istate->cache_nr,
+		       "", 0, &skip, flags);
 	trace2_region_leave("cache_tree", "update", the_repository);
 	trace_performance_leave("cache_tree_update");
 	if (i < 0)
