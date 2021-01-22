@@ -10,6 +10,11 @@ export GIT_TEST_DEFAULT_INITIAL_BRANCH_NAME
 
 . ./lib-bash.sh
 
+if test -n "$GIT_TEST_PIPEFAIL_TRUE"
+then
+	set +o pipefail
+fi
+
 complete ()
 {
 	# do nothing

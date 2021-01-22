@@ -439,6 +439,11 @@ and "sha256".
 GIT_TEST_WRITE_REV_INDEX=<boolean>, when true enables the
 'pack.writeReverseIndex' setting.
 
+GIT_TEST_PIPEFAIL=<boolean>, when true, run 'set -o pipefail' to catch
+failures in commands that aren't the last in a pipe. Defaults to true
+on bash versions which know how to ignore SIGPIPE failures under the
+'set -o pipefail' mode.
+
 Naming Tests
 ------------
 
